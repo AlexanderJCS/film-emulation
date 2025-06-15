@@ -157,11 +157,11 @@ def main():
 
     # Convert to linear space
     frame_linear = rec709_to_linear(frame_lut_rec709)
-    img_show(frame_linear)
+    img_show_and_save("out/linear.jpg", frame_linear)
 
     # Apply halation
     frame_halation = halation(frame_linear)
-    img_show_and_save("out/halation.png", frame_halation)
+    img_show_and_save("out/halation.jpg", frame_halation)
 
     # Film grain
     # a) Denoise the image (since we don't want digital camera noise + film grain)
