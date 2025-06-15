@@ -1,3 +1,12 @@
+.idea
+*.png
+*.jpg
+*.cube
+*.dng
+*.mov
+*.DNG
+*.MOV
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
