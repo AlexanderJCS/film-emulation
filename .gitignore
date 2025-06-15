@@ -8,6 +8,7 @@
 *.MOV
 *.xmp
 *.mp4
+*.jpeg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
