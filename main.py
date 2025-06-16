@@ -135,11 +135,11 @@ def halation(img: np.ndarray) -> np.ndarray:
     thresholded[thresholded < threshold] = 0
 
     # 1. Create a blurred version of the original image (using an exponential falloff kernel)
-    blurred = exponential_blur(thresholded, 20)
+    blurred = exponential_blur(thresholded, 10)
 
     # 2. Add a small amount of the blurred image back to the original, primarily in the red channel and a bit in the green
-    blur_redshift = np.array([1, 0.5, 0.25], dtype=np.float32)
-    halation_strength = 0.25
+    blur_redshift = np.array([1, 0.1, 0], dtype=np.float32)
+    halation_strength = 0.4
     with_halation = img + blurred * blur_redshift * halation_strength
     with_halation[with_halation > 1] = 1  # Clamp values since the addition may go above 1
 
