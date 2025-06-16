@@ -76,6 +76,25 @@ def rec709_to_linear(img: np.ndarray) -> np.ndarray:
     return linear
 
 
+def linear_to_rec709(img: np.ndarray) -> np.ndarray:
+    if img.dtype == np.uint8:
+        raise ValueError("Image must be composed of normalized floats [0, 1]")
+
+    mask = img < 0.018
+    rec709 = np.empty_like(img)
+    rec709[mask] = img[mask] * 4.5
+    rec709[~mask] = 1.099 * img[~mask] ** 0.45 - 0.099
+    return rec709
+
+
+def linear_to_srgb(x):
+    return np.where(
+        x <= 0.0031308,
+        12.92 * x,
+        1.055 * np.power(x, 1/2.4) - 0.055
+    )
+
+
 def exponential_blur(img: np.ndarray, sigma: float, kernel_size=None) -> np.ndarray:
     """
     img: H×W×C or H×W NumPy array as a float
@@ -118,8 +137,6 @@ def halation(img: np.ndarray) -> np.ndarray:
     # 1. Create a blurred version of the original image (using an exponential falloff kernel)
     blurred = exponential_blur(thresholded, 20)
 
-    img_show(blurred)
-
     # 2. Add a small amount of the blurred image back to the original, primarily in the red channel and a bit in the green
     blur_redshift = np.array([1, 0.5, 0.25], dtype=np.float32)
     halation_strength = 0.25
@@ -157,19 +174,20 @@ def main():
 
     # Convert to linear space
     frame_linear = rec709_to_linear(frame_lut_rec709)
-    img_show_and_save("out/linear.jpg", frame_linear)
 
     # Apply halation
     frame_halation = halation(frame_linear)
-    img_show_and_save("out/halation.jpg", frame_halation)
+    img_show_and_save("out/halation.jpg", linear_to_rec709(frame_halation))
 
     # Film grain
     # a) Denoise the image (since we don't want digital camera noise + film grain)
     #      This also makes our image look softer, which is good because film is known to be soft and digital cameras are
     #      known to be sharp.
     denoised = denoise(frame_halation)
-    img_show(denoised)
     img_show_and_save("out/denoised.png", denoised)
+
+    # b) Apply a Monte Carlo film grain technique described by Newson et al. - DOI: 10.5201/ipol.2017.192
+
 
 
 if __name__ == "__main__":
